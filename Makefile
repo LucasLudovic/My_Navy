@@ -6,6 +6,7 @@
 ##
 
 SRC	=	src/main.c
+SRC +=	src/my_navy.c
 
 OBJ	=	$(SRC:.c=.o)
 

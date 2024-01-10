@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2024
 ** Main
 ** File description:
-** Main for the solo stumper
+** Main for the navy project
 */
 
 #include "my_macros.h"

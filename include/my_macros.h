@@ -9,5 +9,7 @@
     #define MY_MACROS_H_
     #define FAILURE 84
     #define SUCCESS 0
+    #define TRUE 1
+    #define FALSE 0
 
 #endif

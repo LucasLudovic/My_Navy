@@ -11,5 +11,10 @@
     #define SUCCESS 0
     #define TRUE 1
     #define FALSE 0
+    #define NO_SIGNAL -1
+    #define ADD 1
+    #define GET 2
+    #define PLAYER1 player->id == 1
+    #define PLAYER2 player->id == 2
 
 #endif

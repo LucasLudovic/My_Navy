@@ -1,0 +1,15 @@
+/*
+** EPITECH PROJECT, 2024
+** my_navy
+** File description:
+** Player manager
+*/
+
+#ifndef CONNECTION_H_
+    #define CONNECTION_H_
+    #include "player.h"
+
+void wait_connection(player_t *player);
+void display_pid(player_t *player);
+
+#endif

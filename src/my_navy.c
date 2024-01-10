@@ -6,8 +6,9 @@
 */
 
 #include "my_macros.h"
+#include "connection.h"
 
-int my_navy(char **av)
+int my_navy(int argc, char **argv)
 {
     return SUCCESS;
 }

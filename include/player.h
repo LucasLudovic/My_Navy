@@ -10,6 +10,8 @@
 
 typedef struct player_s {
     int id;
+    int enemy_pid;
+    int signal_send;
 } player_t;
 
 #endif

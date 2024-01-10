@@ -23,37 +23,50 @@ void display_pid(player_t *player)
 }
 
 static
-int get_signal(int increment, int signal)
+int get_info(int increment, siginfo_t *info, int signal)
 {
-    static int last_signal = 0;
+    static int last_signal = NO_SIGNAL;
+    static pid_t last_pid_other = 0;
 
-    if (increment == ADD)
+    if (increment == GET_SIGNAL)
+        return last_signal;
+    if (increment == GET_PID)
+        return (int)last_pid_other;
+    if (increment == ADD) {
         last_signal = signal;
+        if (info == NULL)
+            return FAILURE;
+        last_pid_other = info->si_pid;
+    }
     return last_signal;
 }
 
 static
-void handle_signal(int signal)
+void handle_signal(int signal, siginfo_t *info, void *context)
 {
-    get_signal(ADD, signal);
+    get_info(ADD, info, signal);
 }
 
-int wait_connection(void)
+int wait_connection(player_t *player)
 {
     struct sigaction sig_action;
     int received_signal = NO_SIGNAL;
 
-    sig_action.sa_flags = 0;
-    sig_action.sa_handler = handle_signal;
+    if (player == NULL)
+        return display_error("Wrong player entered\n");
+    sig_action.sa_flags = SA_SIGINFO;
+    sig_action.sa_sigaction = handle_signal;
     sigemptyset(&sig_action.sa_mask);
-
     if (sigaction(SIGUSR2, &sig_action, NULL) == -1)
         return display_error("Invalid use of sigaction\n");
-    while (received_signal != SIGUSR2)
-    {
+    while (received_signal != SIGUSR2) {
         pause();
-        received_signal = get_signal(GET, 0);
+        received_signal = get_info(GET_SIGNAL, NULL, NO_SIGNAL);
     }
+    player->enemy_pid = get_info(GET_PID, NULL, NO_SIGNAL);
+    if (kill(player->enemy_pid, player->signal_send) == -1)
+        return FAILURE;
+    my_putstr("enemy connected\n");
     return SUCCESS;
 }
 
@@ -69,16 +82,16 @@ int request_connection(char const *pid_str)
     if (pid_to_ping < 0)
         return display_error("A pid must always be positive\n");
     sig_action.sa_flags = 0;
-    sig_action.sa_handler = handle_signal;
+    sig_action.sa_sigaction = handle_signal;
     sigemptyset(&sig_action.sa_mask);
     if (sigaction(SIGUSR1, &sig_action, NULL) == -1)
         return display_error("Invalid use of sigaction\n");
     if (kill(pid_to_ping, SIGUSR2) == -1)
         return display_error("Wrong value of PID entered\n");
-    while (received_signal != SIGUSR1)
-    {
+    while (received_signal != SIGUSR1) {
         pause();
-        received_signal = get_signal(GET, 0);
+        received_signal = get_info(GET_SIGNAL, NULL, NO_SIGNAL);
     }
+    my_putstr("successfully connected\n");
     return SUCCESS;
 }

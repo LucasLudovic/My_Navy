@@ -10,6 +10,8 @@ SRC +=	src/my_navy.c
 SRC	+=	src/connection.c
 SRC	+=	src/retrieve_info_p1.c
 SRC	+=	src/retrieve_info_p2.c
+SRC	+=	src/transform_map.c
+SRC	+=	src/retrieve_info_boat.c
 
 OBJ	=	$(SRC:.c=.o)
 

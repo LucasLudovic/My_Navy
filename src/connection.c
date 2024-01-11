@@ -47,12 +47,13 @@ void handle_signal(int signal, siginfo_t *info, UNUSED void *context)
     get_info(ADD, info, signal);
 }
 
-int init_sigaction(struct sigaction *sig_action)
+int init_sigaction(struct sigaction *sig_action,
+    void (*handler)(int, siginfo_t *, void *))
 {
     if (sig_action == NULL)
         return display_error("Unable to use sigaction\n");
     sig_action->sa_flags = SA_SIGINFO;
-    sig_action->sa_sigaction = handle_signal;
+    sig_action->sa_sigaction = handler;
     sigemptyset(&sig_action->sa_mask);
     return SUCCESS;
 }
@@ -65,7 +66,7 @@ int wait_connection(player_t *player)
 
     if (player == NULL)
         return display_error("Wrong player entered\n");
-    if (init_sigaction(&sig_action) == FAILURE)
+    if (init_sigaction(&sig_action, &handle_signal) == FAILURE)
         return FAILURE;
     if (sigaction(SIGUSR2, &sig_action, NULL) == -1)
         return display_error("Invalid use of sigaction\n");
@@ -90,7 +91,8 @@ int request_connection(char const *pid_str)
     if (pid_str == NULL || my_str_isnum(pid_str) == FALSE)
         return display_error("Wrong value of pid\n");
     pid_to_ping = my_getnbr(pid_str);
-    if (pid_to_ping < 0 || init_sigaction(&sig_action) == FAILURE)
+    if (pid_to_ping < 0 ||
+        init_sigaction(&sig_action, handle_signal) == FAILURE)
         return FAILURE;
     if (sigaction(SIGUSR1, &sig_action, NULL) == -1)
         return display_error("Invalid use of sigaction\n");

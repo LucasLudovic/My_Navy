@@ -10,20 +10,45 @@
 #include <connection.h>
 #include <time.h>
 #include "my.h"
+#include "gameloop.h"
 #include "gameboard.h"
 #include "my_macros.h"
 #include "player.h"
 #include "my_navy.h"
 
+static
+int retrieve_ping(int increment)
+{
+    static int number_of_ping = 0;
+
+    if (increment == SWITCH_STATE)
+        number_of_ping = 0;
+    if (increment == GET_VALUE)
+        return number_of_ping;
+    if (increment == INCREMENT)
+        number_of_ping += 1;
+    return SUCCESS;
+}
+
+static
+void handle_signal(int signal, siginfo_t *info, UNUSED void *context)
+{
+    if (signal == SIGUSR2)
+        retrieve_ping(SWITCH_STATE);
+    if (signal == SIGUSR1)
+        retrieve_ping(INCREMENT);
+}
+
 int receive_attack(player_t *player)
 {
     struct sigaction sig_action;
     int received_signal = NO_SIGNAL;
-    int pid_to_ping = 0;
 
     if (player == NULL)
         return FAILURE;
-    init_sigaction(&sig_action);
+    if (init_sigaction(&sig_action, handle_signal) == FAILURE)
+        return FAILURE;
+    return SUCCESS;
 }
 
 int send_attack(player_t *player, char case_letter, char case_number)
@@ -70,6 +95,13 @@ int play_turn(player_t *player)
     return SUCCESS;
 }
 
+static
+int respond_to_enemy(player_t *player)
+{
+    //add data
+    return SUCCESS;
+}
+
 int loop(player_t *player)
 {
     int game_on = TRUE;
@@ -77,9 +109,13 @@ int loop(player_t *player)
     while (game_on) {
         if (display_user_gameboard(player) == FAILURE)
             return destroy_end(player);
-        if (player->my_turn == TRUE)
+        if (player->my_turn == TRUE) {
             if (play_turn(player) == FAILURE)
                 return FAILURE;
+        } else {
+            if (respond_to_enemy(player) == FAILURE)
+                return FAILURE;
+        }
         sleep(1);
         break;
     }

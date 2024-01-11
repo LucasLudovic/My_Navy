@@ -35,18 +35,13 @@ static
 void init_player(player_t *player, int argc)
 {
     player->id = argc - 1;
-    if (PLAYER1) {
+    player->signal_send = SIGUSR1;
+    player->signal_stop = SIGUSR2;
+    player->enemy_pid = NO_PID;
+    if (PLAYER1)
         player->my_turn = TRUE;
-        player->signal_send = SIGUSR1;
-        player->signal_stop = SIGUSR2;
-        player->enemy_pid = NO_PID;
-    }
-    if (PLAYER2) {
+    if (PLAYER2)
         player->my_turn = FALSE;
-        player->signal_send = SIGUSR2;
-        player->signal_stop = SIGUSR1;
-        player->enemy_pid = NO_PID;
-    }
     player->enemy_map = NULL;
     player->map = NULL;
 }

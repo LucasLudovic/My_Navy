@@ -68,9 +68,9 @@ int wait_connection(player_t *player)
         return display_error("Wrong player entered\n");
     if (init_sigaction(&sig_action, &handle_signal) == FAILURE)
         return FAILURE;
-    if (sigaction(SIGUSR2, &sig_action, NULL) == -1)
+    if (sigaction(SIGUSR1, &sig_action, NULL) == -1)
         return display_error("Invalid use of sigaction\n");
-    while (received_signal != SIGUSR2) {
+    while (received_signal != SIGUSR1) {
         pause();
         received_signal = get_info(GET_SIGNAL, NULL, NO_SIGNAL);
     }
@@ -96,7 +96,7 @@ int request_connection(char const *pid_str)
         return FAILURE;
     if (sigaction(SIGUSR1, &sig_action, NULL) == -1)
         return display_error("Invalid use of sigaction\n");
-    if (kill(pid_to_ping, SIGUSR2) == -1)
+    if (kill(pid_to_ping, SIGUSR1) == -1)
         return display_error("Wrong value of PID entered\n");
     while (received_signal != SIGUSR1) {
         pause();

@@ -12,6 +12,17 @@
 #include "player.h"
 
 static
+void display_boats(char **map, int i)
+{
+    for (int j = 0; j < X_CASE; j += 1) {
+        my_putchar(map[i][j]);
+        if (j < X_CASE - 1)
+            my_putchar(' ');
+    }
+    my_putchar('\n');
+}
+
+static
 void display_single_gameboard(char display, char **map)
 {
     if (display == 1)
@@ -21,14 +32,11 @@ void display_single_gameboard(char display, char **map)
     my_putstr(" |A B C D E F G H\n");
     my_putstr("-+---------------\n");
     for (int i = 0; i < Y_CASE; i += 1) {
+        if (map[i] == NULL)
+            break;
         my_putchar(i + '1');
         my_putchar('|');
-        for (int j = 0; j < X_CASE; j += 1) {
-            write(1, &map[i][j], 1);
-            if (j < X_CASE - 1)
-                my_putchar(' ');
-        }
-        my_putchar('\n');
+        display_boats(map, i);
     }
 }
 

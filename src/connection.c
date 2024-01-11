@@ -48,6 +48,17 @@ void handle_signal(int signal, siginfo_t *info, void *context)
 }
 
 static
+int init_sigaction(struct sigaction *sig_action)
+{
+    if (sig_action == NULL)
+        return display_error("Unable to use sigaction\n");
+    sig_action->sa_flags = SA_SIGINFO;
+    sig_action->sa_sigaction = handle_signal;
+    sigemptyset(&sig_action->sa_mask);
+    return SUCCESS;
+}
+
+static
 int wait_connection(player_t *player)
 {
     struct sigaction sig_action;
@@ -55,9 +66,8 @@ int wait_connection(player_t *player)
 
     if (player == NULL)
         return display_error("Wrong player entered\n");
-    sig_action.sa_flags = SA_SIGINFO;
-    sig_action.sa_sigaction = handle_signal;
-    sigemptyset(&sig_action.sa_mask);
+    if (init_sigaction(&sig_action) == FAILURE)
+        return FAILURE;
     if (sigaction(SIGUSR2, &sig_action, NULL) == -1)
         return display_error("Invalid use of sigaction\n");
     while (received_signal != SIGUSR2) {
@@ -81,11 +91,8 @@ int request_connection(char const *pid_str)
     if (pid_str == NULL || my_str_isnum(pid_str) == FALSE)
         return display_error("Wrong value of pid\n");
     pid_to_ping = my_getnbr(pid_str);
-    if (pid_to_ping < 0)
-        return display_error("A pid must always be positive\n");
-    sig_action.sa_flags = 0;
-    sig_action.sa_sigaction = handle_signal;
-    sigemptyset(&sig_action.sa_mask);
+    if (pid_to_ping < 0 || init_sigaction(&sig_action) == FAILURE)
+        return FAILURE;
     if (sigaction(SIGUSR1, &sig_action, NULL) == -1)
         return display_error("Invalid use of sigaction\n");
     if (kill(pid_to_ping, SIGUSR2) == -1)

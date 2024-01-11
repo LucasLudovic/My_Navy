@@ -56,7 +56,8 @@ int get_nb_of_words(char const *str)
         if ((!condition1 && condition2) || (!condition3 && condition4))
             words += 1;
     }
-    if (my_isalphanum(str[my_strlen(str) - 1]) || str[my_strlen(str) - 1] == '.')
+    if (my_isalphanum(str[my_strlen(str) - 1]) ||
+        str[my_strlen(str) - 1] == '.')
         words += 1;
     return words;
 }

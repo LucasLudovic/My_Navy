@@ -11,5 +11,6 @@
 
 void display_pid(player_t *player);
 int connect_player(player_t *player, int argc, char **argv);
+int init_sigaction(struct sigaction *sig_action);
 
 #endif

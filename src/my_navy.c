@@ -11,6 +11,7 @@
 #include "my_macros.h"
 #include "connection.h"
 #include "gameboard.h"
+#include "gameloop.h"
 
 int destroy_end(player_t *player)
 {
@@ -30,23 +31,39 @@ int destroy_end(player_t *player)
     return FAILURE;
 }
 
+static
+void init_player(player_t *player, int argc)
+{
+    player->id = argc - 1;
+    if (PLAYER1) {
+        player->my_turn = TRUE;
+        player->signal_send = SIGUSR1;
+        player->signal_stop = SIGUSR2;
+        player->enemy_pid = NO_PID;
+    }
+    if (PLAYER2) {
+        player->my_turn = FALSE;
+        player->signal_send = SIGUSR2;
+        player->signal_stop = SIGUSR1;
+        player->enemy_pid = NO_PID;
+    }
+    player->enemy_map = NULL;
+    player->map = NULL;
+}
+
 int my_navy(int argc, char **argv)
 {
     player_t *player = NULL;
-    int game_on = TRUE;
 
     player = malloc(sizeof(player_t));
     if (player == NULL)
         return destroy_end(player);
-    player->id = argc - 1;
+    init_player(player, argc);
     display_pid(player);
     if (connect_player(player, argc, argv) == FAILURE)
         return destroy_end(player);
-    while (game_on) {
-        if (display_user_gameboard(player) == FAILURE)
-            return destroy_end(player);
-        sleep(1);
-    }
+    if (loop(player) == FAILURE)
+        return destroy_end(player);
     destroy_end(player);
     return SUCCESS;
 }

@@ -13,6 +13,7 @@ SRC	+=	src/retrieve_info_boat.c
 SRC	+=	src/retrieve_info_p1.c
 SRC	+=	src/retrieve_info_p2.c
 SRC	+=	src/transform_map.c
+SRC	+=	src/gameloop.c
 
 OBJ	=	$(SRC:.c=.o)
 

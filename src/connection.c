@@ -42,12 +42,11 @@ int get_info(int increment, siginfo_t *info, int signal)
 }
 
 static
-void handle_signal(int signal, siginfo_t *info, void *context)
+void handle_signal(int signal, siginfo_t *info, UNUSED void *context)
 {
     get_info(ADD, info, signal);
 }
 
-static
 int init_sigaction(struct sigaction *sig_action)
 {
     if (sig_action == NULL)
@@ -110,14 +109,10 @@ int connect_player(player_t *player, int argc, char **argv)
     if (argv == NULL || argc < 2 || argv[1] == NULL || player == NULL)
         return FAILURE;
     if (PLAYER1) {
-        player->my_turn = TRUE;
-        player->signal_send = SIGUSR1;
         if (wait_connection(player) == FAILURE)
             return FAILURE;
     }
     if (PLAYER2) {
-        player->my_turn = FALSE;
-        player->signal_send = SIGUSR2;
         if (request_connection(argv[1]) == FAILURE)
             return FAILURE;
     }

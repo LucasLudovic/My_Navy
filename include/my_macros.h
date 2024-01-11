@@ -7,6 +7,7 @@
 
 #ifndef MY_MACROS_H_
     #define MY_MACROS_H_
+    #define UNUSED __attribute__((unused))
     #define FAILURE 84
     #define SUCCESS 0
     #define TRUE 1
@@ -19,5 +20,6 @@
     #define PLAYER2 player->id == 2
     #define X_CASE 8
     #define Y_CASE 8
+    #define NO_PID -1
 
 #endif

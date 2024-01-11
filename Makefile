@@ -8,7 +8,6 @@
 SRC	=	src/main.c
 SRC +=	src/my_navy.c
 SRC	+=	src/connection.c
-SRC	+=	src/gameboard.c
 
 OBJ	=	$(SRC:.c=.o)
 

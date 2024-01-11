@@ -25,6 +25,7 @@ int transform_map(char **map)
 {
     char **info = NULL;
     map1_t *map_s = NULL;
+
     if (map == NULL)
         return FAILURE;
     map_s = malloc(sizeof(map1_t) * count_boat(map));

@@ -42,9 +42,10 @@ void display_single_gameboard(char display, char **map)
 
 int display_user_gameboard(player_t *player)
 {
-    //supprimer ces deux lignes une fois que la map est initialisée
     player->map = my_str_to_word_array("12345678 87654321 12345678 87654321");
-    player->enemy_map = my_str_to_word_array("........ ........ ........ ........ ........ ........ ........ ........");
+    player->enemy_map = my_str_to_word_array("........ ........ ........"
+        " ........ ........ ........"
+        " ........ ........");
     if (player == NULL || player->map == NULL || player->enemy_map == NULL)
         return FAILURE;
     display_single_gameboard(1, player->map);

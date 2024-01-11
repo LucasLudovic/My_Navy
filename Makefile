@@ -8,6 +8,11 @@
 SRC	=	src/main.c
 SRC +=	src/my_navy.c
 SRC	+=	src/connection.c
+SRC	+=	src/gameboard.c
+SRC	+=	src/retrieve_info_boat.c
+SRC	+=	src/retrieve_info_p1.c
+SRC	+=	src/retrieve_info_p2.c
+SRC	+=	src/transform_map.c
 
 OBJ	=	$(SRC:.c=.o)
 

@@ -28,7 +28,7 @@ static int delete_linebreak(char **map)
     return SUCCESS;
 }
 
-static int assign_map(char **av, char **map)
+static int assign_map(char const **av, char **map)
 {
     FILE *file = fopen(av[1], "r");
     char *buff = NULL;
@@ -49,7 +49,7 @@ static int assign_map(char **av, char **map)
     return SUCCESS;
 }
 
-char **retrieve_info_p1(char **av)
+char **retrieve_info_p1(char const **av)
 {
     FILE *file = fopen(av[1], "r");
     char *buff = NULL;

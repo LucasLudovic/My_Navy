@@ -12,6 +12,9 @@ typedef struct player_s {
     int id;
     int enemy_pid;
     int signal_send;
+    int signal_stop;
+    char **map;
+    char **enemy_map;
 } player_t;
 
 #endif

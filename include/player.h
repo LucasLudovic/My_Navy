@@ -10,6 +10,7 @@
 
 typedef struct player_s {
     int id;
+    int my_turn;
     int enemy_pid;
     int signal_send;
     int signal_stop;

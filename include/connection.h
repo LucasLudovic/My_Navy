@@ -9,8 +9,7 @@
     #define CONNECTION_H_
     #include "player.h"
 
-int wait_connection(player_t *player);
 void display_pid(player_t *player);
-int request_connection(char const *pid_str);
+int connect_player(player_t *player, int argc, char **argv);
 
 #endif

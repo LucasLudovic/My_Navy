@@ -45,14 +45,18 @@ int get_nb_of_words(char const *str)
     int words = 0;
     int condition1 = 0;
     int condition2 = 0;
+    int condition3 = 0;
+    int condition4 = 0;
 
     for (int i = 1; str[i] != '\0'; i += 1) {
         condition1 = my_isalphanum(str[i]);
         condition2 = my_isalphanum(str[i - 1]);
-        if (!condition1 && condition2)
+        condition3 = str[i] == '.';
+        condition4 = str[i - 1] == '.';
+        if ((!condition1 && condition2) || (!condition3 && condition4))
             words += 1;
     }
-    if (my_isalphanum(str[my_strlen(str) - 1]))
+    if (my_isalphanum(str[my_strlen(str) - 1]) || str[my_strlen(str) - 1] == '.')
         words += 1;
     return words;
 }

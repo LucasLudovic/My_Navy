@@ -47,6 +47,7 @@ void handle_signal(int signal, siginfo_t *info, void *context)
     get_info(ADD, info, signal);
 }
 
+static
 int wait_connection(player_t *player)
 {
     struct sigaction sig_action;
@@ -66,10 +67,11 @@ int wait_connection(player_t *player)
     player->enemy_pid = get_info(GET_PID, NULL, NO_SIGNAL);
     if (kill(player->enemy_pid, player->signal_send) == -1)
         return FAILURE;
-    my_putstr("enemy connected\n");
+    my_putstr("enemy connected\n\n");
     return SUCCESS;
 }
 
+static
 int request_connection(char const *pid_str)
 {
     struct sigaction sig_action;
@@ -92,6 +94,25 @@ int request_connection(char const *pid_str)
         pause();
         received_signal = get_info(GET_SIGNAL, NULL, NO_SIGNAL);
     }
-    my_putstr("successfully connected\n");
+    my_putstr("successfully connected\n\n");
+    return SUCCESS;
+}
+
+int connect_player(player_t *player, int argc, char **argv)
+{
+    if (argv == NULL || argc < 2 || argv[1] == NULL || player == NULL)
+        return FAILURE;
+    if (PLAYER1) {
+        player->my_turn = TRUE;
+        player->signal_send = SIGUSR1;
+        if (wait_connection(player) == FAILURE)
+            return FAILURE;
+    }
+    if (PLAYER2) {
+        player->my_turn = FALSE;
+        player->signal_send = SIGUSR2;
+        if (request_connection(argv[1]) == FAILURE)
+            return FAILURE;
+    }
     return SUCCESS;
 }

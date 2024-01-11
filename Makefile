@@ -8,6 +8,7 @@
 SRC	=	src/main.c
 SRC +=	src/my_navy.c
 SRC	+=	src/connection.c
+SRC	+=	src/retrieve_info_p1.c
 
 OBJ	=	$(SRC:.c=.o)
 

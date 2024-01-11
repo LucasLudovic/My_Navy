@@ -17,5 +17,7 @@
     #define GET_PID 3
     #define PLAYER1 player->id == 1
     #define PLAYER2 player->id == 2
+    #define X_CASE 8
+    #define Y_CASE 8
 
 #endif

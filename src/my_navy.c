@@ -9,6 +9,7 @@
 #include <signal.h>
 #include "my_macros.h"
 #include "connection.h"
+#include "gameboard.h"
 
 int my_navy(int argc, char **argv)
 {
@@ -29,6 +30,8 @@ int my_navy(int argc, char **argv)
         if (request_connection(argv[1]) == FAILURE)
             return FAILURE;
     }
+    if (display_user_gameboard(player) == FAILURE)
+        return FAILURE;
     if (player != NULL)
         free(player);
     return SUCCESS;

@@ -10,5 +10,6 @@
 
 int my_navy(int argc, char **argv);
 char **retrieve_info_p1(char **av);
+char **retrieve_info_p2(char **av);
 
 #endif

@@ -20,6 +20,8 @@ static void check_linebreak(char **map, int y, int i)
 
 static int delete_linebreak(char **map)
 {
+    if (map == NULL)
+        return FAILURE;
     for (int y = 0; map[y] != NULL; y += 1)
         for (int i = 0; map[y][i] != '\0'; i += 1)
             check_linebreak(map, y, i);

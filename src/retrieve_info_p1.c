@@ -41,7 +41,7 @@ static int assign_map(char const **av, char **map)
         map[i] = my_strdup(buff);
         i += 1;
     }
-    map[i - 1] = NULL;
+    map[i] = NULL;
     if (buff != NULL)
         free(buff);
     if (file != NULL)
@@ -64,11 +64,11 @@ char **retrieve_info_p1(char const **av)
         end_file = getline(&buff, &len, file);
         count += 1;
         }
-    map = malloc(sizeof(char *) * count + 1);
+    map = malloc(sizeof(char *) * (count + 1));
     assign_map(av, map);
     delete_linebreak(map);
     if (buff != NULL)
         free(buff);
     fclose(file);
-    return map; //penser à free la map
+    return map;
 }

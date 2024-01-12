@@ -69,6 +69,5 @@ char **retrieve_info_p2(char const **av)
     if (buff != NULL)
         free(buff);
     fclose(file);
-    printf("map = %s\n", map[0]);
-    return map; //penser à free la map
+    return map;
 }

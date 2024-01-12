@@ -5,6 +5,7 @@
 ** Header for the gameloop function
 */
 
+#include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
 #include <connection.h>
@@ -20,9 +21,14 @@ static
 int retrieve_ping(int increment)
 {
     static int number_of_ping = 0;
+    static int state_changed = 0;
 
-    if (increment == SWITCH_STATE)
+    if (state_changed > 1)
+        return END_RETRIEVE;
+    if (increment == SWITCH_STATE) {
         number_of_ping = 0;
+        state_changed += 1;
+    }
     if (increment == GET_VALUE)
         return number_of_ping;
     if (increment == INCREMENT)
@@ -42,12 +48,20 @@ void handle_signal(int signal, siginfo_t *info, UNUSED void *context)
 int receive_attack(player_t *player)
 {
     struct sigaction sig_action;
-    int received_signal = NO_SIGNAL;
+    int received_value = 0;
 
     if (player == NULL)
         return FAILURE;
     if (init_sigaction(&sig_action, handle_signal) == FAILURE)
         return FAILURE;
+    if (sigaction(SIGUSR1, &sig_action, NULL) == -1)
+        return display_error("Error setting SIGUSR1\n");
+    if (sigaction(SIGUSR2, &sig_action, NULL) == -1)
+        return display_error("Error setting SIGUSR2\n");
+    while (received_value != END_RETRIEVE) {
+        pause();
+        received_value = retrieve_ping(GET_VALUE);
+    }
     return SUCCESS;
 }
 
@@ -59,18 +73,19 @@ int send_attack(player_t *player, char case_letter, char case_number)
     usleep(1000);
     for (int i = 0; i < ping_letter; i += 1) {
         if (kill(player->enemy_pid, player->signal_send) == -1)
-            return FAILURE;
+            return display_error("Unable to send the letter case\n");
         usleep(1000);
     }
     if (kill(player->enemy_pid, player->signal_stop) == -1)
-        return FAILURE;
+        return display_error("Unable to send the change state\n");
+    usleep(1000);
     for (int i = 0; i < ping_number; i += 1) {
         if (kill(player->enemy_pid, player->signal_send) == -1)
-            return FAILURE;
+            return display_error("Unable to send the number case\n");
         usleep(1000);
     }
     if (kill(player->enemy_pid, player->signal_stop) == -1)
-        return FAILURE;
+        return display_error("Unable to send the end_game\n");
     return SUCCESS;
 }
 
@@ -83,23 +98,23 @@ int play_turn(player_t *player)
         return FAILURE;
     my_putstr("attack : ");
     if (read(STDIN_FILENO, buff, 3) == -1)
-        return FAILURE;
+        return display_error("Unable to read the attack\n");
     if (buff[2] != '\n')
-        return FAILURE;
+        return display_error("Wrong value entered\n");
     buff[2] = '\0';
-    if ((buff[0] < 'A' || buff[0] > 'H') ||
+    if ((buff[0] < 'A' || buff[0] > 'H') &&
         (buff[1] < '1' || buff[1] > '8'))
-        return FAILURE;
+        return display_error("Wrong attack entered\n");
     my_putstr(buff);
-    send_attack(player, buff[0], buff[1]);
+    if (send_attack(player, buff[0], buff[1]) == FAILURE)
+        return FAILURE;
     return SUCCESS;
 }
 
 static
 int respond_to_enemy(player_t *player)
 {
-    //add data
-    return SUCCESS;
+    return receive_attack(player);
 }
 
 int loop(player_t *player)
@@ -117,7 +132,6 @@ int loop(player_t *player)
                 return FAILURE;
         }
         sleep(1);
-        break;
     }
     return SUCCESS;
 }

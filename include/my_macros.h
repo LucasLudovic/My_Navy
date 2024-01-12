@@ -21,5 +21,6 @@
     #define X_CASE 8
     #define Y_CASE 8
     #define NO_PID -1
+    #define END_RETRIEVE -1
 
 #endif

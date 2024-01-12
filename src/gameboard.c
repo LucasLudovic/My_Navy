@@ -42,7 +42,8 @@ void display_single_gameboard(char display, char **map)
 
 int display_user_gameboard(player_t *player)
 {
-    player->map = my_str_to_word_array("12345678 87654321 12345678 87654321");
+    player->map = my_str_to_word_array(".55555.3 .......3 .......3 .......3 ........"
+                                       " ..22.... ....4444 ........ ........");
     player->enemy_map = my_str_to_word_array("........ ........ ........"
         " ........ ........ ........"
         " ........ ........");

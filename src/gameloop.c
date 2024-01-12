@@ -49,6 +49,38 @@ void handle_signal(int signal, siginfo_t *info, UNUSED void *context)
         retrieve_ping(INCREMENT);
 }
 
+static
+int respond_hit(player_t *player, int is_hit)
+{
+    if (is_hit == TRUE) {
+        my_putstr("hit\n");
+        usleep(1000);
+        kill(player->enemy_pid, player->signal_send);
+        usleep(1000);
+    } else {
+        my_putstr("missed\n");
+        usleep(1000);
+        kill(player->enemy_pid, player->signal_stop);
+        usleep(1000);
+    }
+    return SUCCESS;
+}
+
+static
+int respond_to_attack(player_t *player, int received_number, int received_letter)
+{
+    int is_hit = FALSE;
+
+    if (player == NULL || player->map == NULL)
+        return display_error("Unable to use player in response\n");
+    if (received_number < 0 || received_letter < 0)
+        return display_error("Wrong attack values\n");
+    printf("Test : %i-%i\n", received_number, received_letter);
+    if (player->map[received_number][received_letter] != '.')
+        is_hit = TRUE;
+    return respond_hit(player, is_hit);
+}
+
 int receive_attack(player_t *player)
 {
     struct sigaction sig_action;
@@ -79,10 +111,32 @@ int receive_attack(player_t *player)
                 player->my_turn = TRUE;
                 received_number = retrieve_ping(GET_VALUE);
                 my_putchar(received_number + '1');
-                my_putchar('\n');
+                my_putstr(": ");
             }
             retrieve_ping(RESET_PING);
         }
+    }
+    return respond_to_attack(player, received_number, received_letter);
+}
+
+static
+int get_hit_enemy(player_t *player)
+{
+    struct sigaction sig_action;
+
+    if (init_sigaction(&sig_action, handle_signal) == FAILURE)
+        return FAILURE;
+    if (sigaction(SIGUSR1, &sig_action, NULL) == -1)
+        return display_error("Error setting SIGUSR1\n");
+    if (sigaction(SIGUSR2, &sig_action, NULL) == -1)
+        return display_error("Error setting SIGUSR2\n");
+    pause();
+    if (retrieve_ping(GET_VALUE) == 0)
+        my_putstr("missed\n");
+    else {
+        my_putstr("hit\n");
+        retrieve_ping(SWITCH_STATE);
+        retrieve_ping(RESET_PING);
     }
     return SUCCESS;
 }
@@ -130,13 +184,7 @@ int play_turn(player_t *player)
         return display_error("Wrong attack entered\n");
     if (send_attack(player, buff[0], buff[1]) == FAILURE)
         return FAILURE;
-    return SUCCESS;
-}
-
-static
-int respond_to_enemy(player_t *player)
-{
-    return receive_attack(player);
+    return get_hit_enemy(player);
 }
 
 int loop(player_t *player)
@@ -151,7 +199,7 @@ int loop(player_t *player)
                 return FAILURE;
         } else {
             my_putstr("waiting for enemy's attack...\n");
-            if (respond_to_enemy(player) == FAILURE)
+            if (receive_attack(player) == FAILURE)
                 return FAILURE;
         }
         usleep(1000);

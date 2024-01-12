@@ -14,18 +14,18 @@
 static int my_isnum(char c)
 {
     if (c >= 48 && c <= 57) {
-        return 0;
+        return FALSE;
     } else {
-        return 1;
+        return TRUE;
     }
 }
 
 static int ismap(char c)
 {
     if (my_isnum(c) == 0 || (c >= 65 && c <= 90)) {
-        return 0;
+        return FALSE;
     } else {
-        return 1;
+        return TRUE;
     }
 }
 

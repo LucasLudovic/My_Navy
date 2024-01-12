@@ -12,6 +12,7 @@
 #include "connection.h"
 #include "gameboard.h"
 #include "gameloop.h"
+#include "my_navy.h"
 
 int destroy_end(player_t *player)
 {
@@ -49,10 +50,12 @@ void init_player(player_t *player, int argc)
 int my_navy(int argc, char **argv)
 {
     player_t *player = NULL;
+    char **map = retrieve_info_p1(argv);
 
     player = malloc(sizeof(player_t));
     if (player == NULL)
         return destroy_end(player);
+    transform_map(map, player);
     init_player(player, argc);
     display_pid(player);
     if (connect_player(player, argc, argv) == FAILURE)

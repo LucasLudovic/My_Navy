@@ -18,6 +18,7 @@
     #define GET_SIGNAL 2
     #define GET_PID 3
     #define RESET_PING 4
+    #define RESET_STATE 5
     #define PLAYER1 player->id == 1
     #define PLAYER2 player->id == 2
     #define X_CASE 8

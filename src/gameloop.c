@@ -23,6 +23,8 @@ int retrieve_ping(int increment)
     static int number_of_ping = 0;
     static int state_changed = 0;
 
+    if (increment == RESET_STATE)
+        state_changed = 0;
     if (state_changed == 1) {
         state_changed = 0;
         return END_RETRIEVE;
@@ -124,6 +126,8 @@ int get_hit_enemy(player_t *player)
 {
     struct sigaction sig_action;
 
+    retrieve_ping(RESET_PING);
+    retrieve_ping(RESET_STATE);
     if (init_sigaction(&sig_action, handle_signal) == FAILURE)
         return FAILURE;
     if (sigaction(SIGUSR1, &sig_action, NULL) == -1)
@@ -131,13 +135,14 @@ int get_hit_enemy(player_t *player)
     if (sigaction(SIGUSR2, &sig_action, NULL) == -1)
         return display_error("Error setting SIGUSR2\n");
     pause();
-    if (retrieve_ping(GET_VALUE) == 0)
+    printf("Hit value = %i\n", retrieve_ping(GET_VALUE));
+    if (retrieve_ping(GET_VALUE) == 0) {
         my_putstr("missed\n");
-    else {
+    } else {
         my_putstr("hit\n");
-        retrieve_ping(SWITCH_STATE);
-        retrieve_ping(RESET_PING);
     }
+    retrieve_ping(RESET_PING);
+    retrieve_ping(RESET_STATE);
     return SUCCESS;
 }
 

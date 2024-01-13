@@ -48,6 +48,16 @@ void init_player(player_t *player, char **argv, int argc)
     }
     player->enemy_map = NULL;
     player->map = NULL;
+    // A supprimer
+    if (PLAYER2)
+        player->map = my_str_to_word_array(".55555.3 .......3 .......3"
+                                           " ..22.... ........ ....4444 ........ ........");
+    if (PLAYER1)
+        player->map = my_str_to_word_array("..2..... ..2..... ........ ...333.. .4......"
+                                           " .4...... .4.55555 .4......");
+    player->enemy_map = my_str_to_word_array("........ ........ ........"
+                                             " ........ ........ ........"
+                                             " ........ ........");
 }
 
 int my_navy(int argc, char **argv)

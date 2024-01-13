@@ -23,27 +23,31 @@ int retrieve_ping(int increment)
     static int number_of_ping = 0;
     static int state_changed = 0;
 
-    if (increment == RESET_STATE)
+    if (increment == RESET_STATE) {
         state_changed = 0;
+        return SUCCESS;
+    }
+    if (increment == RESET_PING) {
+        number_of_ping = 0;
+        return SUCCESS;
+    }
     if (state_changed == 1) {
         state_changed = 0;
         return END_RETRIEVE;
     }
+    if (increment == INCREMENT)
+        number_of_ping += 1;
     if (increment == GET_VALUE)
         return number_of_ping;
-    if (increment == RESET_PING)
-        number_of_ping = 0;
     if (increment == SWITCH_STATE) {
         state_changed += 1;
         return END_RETRIEVE;
     }
-    if (increment == INCREMENT)
-        number_of_ping += 1;
     return SUCCESS;
 }
 
 static
-void handle_signal(int signal, siginfo_t *info, UNUSED void *context)
+void handle_signal(int signal, UNUSED siginfo_t *info, UNUSED void *context)
 {
     if (signal == SIGUSR2)
         retrieve_ping(SWITCH_STATE);
@@ -52,14 +56,16 @@ void handle_signal(int signal, siginfo_t *info, UNUSED void *context)
 }
 
 static
-int respond_hit(player_t *player, int is_hit)
+int respond_hit(player_t *player, int is_hit, int received_number, int received_letter)
 {
     if (is_hit == TRUE) {
+        player->map[received_number][received_letter] = 'x';
         my_putstr("hit\n");
         usleep(1000);
         kill(player->enemy_pid, player->signal_send);
         usleep(1000);
     } else {
+        player->map[received_number][received_letter] = 'o';
         my_putstr("missed\n");
         usleep(1000);
         kill(player->enemy_pid, player->signal_stop);
@@ -78,9 +84,10 @@ int respond_to_attack(player_t *player, int received_number, int received_letter
     if (received_number < 0 || received_letter < 0)
         return display_error("Wrong attack values\n");
     printf("Test : %i-%i\n", received_number, received_letter);
-    if (player->map[received_number][received_letter] != '.')
+    if (player->map[received_number][received_letter] != '.') {
         is_hit = TRUE;
-    return respond_hit(player, is_hit);
+    }
+    return respond_hit(player, is_hit, received_number, received_letter);
 }
 
 int receive_attack(player_t *player)
@@ -122,7 +129,7 @@ int receive_attack(player_t *player)
 }
 
 static
-int get_hit_enemy(player_t *player)
+int get_hit_enemy(player_t *player, int ping_letter, int ping_number)
 {
     struct sigaction sig_action;
 
@@ -135,11 +142,13 @@ int get_hit_enemy(player_t *player)
     if (sigaction(SIGUSR2, &sig_action, NULL) == -1)
         return display_error("Error setting SIGUSR2\n");
     pause();
-    printf("Hit value = %i\n", retrieve_ping(GET_VALUE));
+    retrieve_ping(RESET_STATE);
     if (retrieve_ping(GET_VALUE) == 0) {
         my_putstr("missed\n");
+        player->enemy_map[ping_number][ping_letter] = 'o';
     } else {
         my_putstr("hit\n");
+        player->enemy_map[ping_number][ping_letter] = 'x';
     }
     retrieve_ping(RESET_PING);
     retrieve_ping(RESET_STATE);
@@ -189,7 +198,7 @@ int play_turn(player_t *player)
         return display_error("Wrong attack entered\n");
     if (send_attack(player, buff[0], buff[1]) == FAILURE)
         return FAILURE;
-    return get_hit_enemy(player);
+    return get_hit_enemy(player, buff[0] - 'A', buff[1] - '1');
 }
 
 int loop(player_t *player)

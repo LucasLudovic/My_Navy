@@ -16,7 +16,7 @@
 
 static
 int respond_hit(player_t *player, int is_hit, int received_number,
-                int received_letter)
+    int received_letter)
 {
     if (is_hit == TRUE) {
         player->map[received_number][received_letter] = 'x';
@@ -36,7 +36,7 @@ int respond_hit(player_t *player, int is_hit, int received_number,
 
 static
 int respond_to_attack(player_t *player, int received_number,
-                      int received_letter)
+    int received_letter)
 {
     int is_hit = FALSE;
 
@@ -44,17 +44,55 @@ int respond_to_attack(player_t *player, int received_number,
         return display_error("Unable to use player in response\n");
     if (received_number < 0 || received_letter < 0)
         return display_error("Wrong attack values\n");
-    printf("Test : %i-%i\n", received_number, received_letter);
     if (player->map[received_number][received_letter] != '.') {
         is_hit = TRUE;
     }
     return respond_hit(player, is_hit, received_number, received_letter);
 }
 
+static
+void receive_letter_case(int *received_value, int *received_letter,
+    int changed_state)
+{
+    if (changed_state == 1) {
+        *received_letter = retrieve_ping(GET_VALUE);
+        my_putchar(*received_letter + 'A');
+        *received_value = 0;
+    }
+}
+
+static
+void receive_number_case(player_t *player, int *received_number,
+    int changed_state)
+{
+    if (changed_state == 2) {
+        player->my_turn = TRUE;
+        *received_number = retrieve_ping(GET_VALUE);
+        my_putchar(*received_number + '1');
+        my_putstr(": ");
+    }
+}
+
+static
+void receive_values(player_t *player, int *changed_state, int *received_letter,
+    int *received_number)
+{
+    static int received_value = 0;
+
+    received_value = retrieve_ping(GET_VALUE);
+    if (received_value == END_RETRIEVE) {
+        *changed_state += 1;
+        receive_letter_case(&received_value, received_letter, *changed_state);
+        receive_number_case(player, received_number, *changed_state);
+        retrieve_ping(RESET_PING);
+    }
+    if (*changed_state == 2)
+        received_value = 0;
+}
+
 int receive_attack(player_t *player)
 {
     struct sigaction sig_action;
-    int received_value = 0;
     int received_letter = 0;
     int received_number = 0;
     int changed_state = 0;
@@ -69,22 +107,8 @@ int receive_attack(player_t *player)
         return display_error("Error setting SIGUSR2\n");
     while (changed_state < 2) {
         pause();
-        received_value = retrieve_ping(GET_VALUE);
-        if (received_value == END_RETRIEVE) {
-            changed_state += 1;
-            if (changed_state == 1) {
-                received_letter = retrieve_ping(GET_VALUE);
-                my_putchar(received_letter + 'A');
-                received_value = 0;
-            }
-            if (changed_state == 2) {
-                player->my_turn = TRUE;
-                received_number = retrieve_ping(GET_VALUE);
-                my_putchar(received_number + '1');
-                my_putstr(": ");
-            }
-            retrieve_ping(RESET_PING);
-        }
+        receive_values(player, &changed_state, &received_letter,
+            &received_number);
     }
     return respond_to_attack(player, received_number, received_letter);
 }

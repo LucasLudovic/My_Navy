@@ -15,12 +15,18 @@
 #include "player.h"
 
 static
+void reset_connections_value(void)
+{
+    retrieve_ping(RESET_PING);
+    retrieve_ping(RESET_STATE);
+}
+
+static
 int get_hit_enemy(player_t *player, int ping_letter, int ping_number)
 {
     struct sigaction sig_action;
 
-    retrieve_ping(RESET_PING);
-    retrieve_ping(RESET_STATE);
+    reset_connections_value();
     if (init_sigaction(&sig_action, handle_signal) == FAILURE)
         return FAILURE;
     if (sigaction(SIGUSR1, &sig_action, NULL) == -1)
@@ -36,8 +42,34 @@ int get_hit_enemy(player_t *player, int ping_letter, int ping_number)
         my_putstr("hit\n");
         player->enemy_map[ping_number][ping_letter] = 'x';
     }
-    retrieve_ping(RESET_PING);
-    retrieve_ping(RESET_STATE);
+    reset_connections_value();
+    return SUCCESS;
+}
+
+static
+int send_letter(player_t *player, int ping_letter)
+{
+    for (int i = 0; i < ping_letter; i += 1) {
+        if (kill(player->enemy_pid, player->signal_send) == -1)
+            return display_error("Unable to send the letter case\n");
+        usleep(1000);
+    }
+    if (kill(player->enemy_pid, player->signal_stop) == -1)
+        return display_error("Unable to send the change state\n");
+    usleep(1000);
+    return SUCCESS;
+}
+
+static
+int send_number(player_t *player, int ping_number)
+{
+    for (int i = 0; i < ping_number; i += 1) {
+        if (kill(player->enemy_pid, player->signal_send) == -1)
+            return display_error("Unable to send the number case\n");
+        usleep(1000);
+    }
+    if (kill(player->enemy_pid, player->signal_stop) == -1)
+        return display_error("Unable to send the end turn\n");
     return SUCCESS;
 }
 
@@ -48,28 +80,17 @@ int send_attack(player_t *player, char case_letter, char case_number)
     int ping_number = case_number - '1';
 
     usleep(1000);
-    for (int i = 0; i < ping_letter; i += 1) {
-        if (kill(player->enemy_pid, player->signal_send) == -1)
-            return display_error("Unable to send the letter case\n");
-        usleep(1000);
-    }
-    if (kill(player->enemy_pid, player->signal_stop) == -1)
-        return display_error("Unable to send the change state\n");
-    usleep(1000);
-    for (int i = 0; i < ping_number; i += 1) {
-        if (kill(player->enemy_pid, player->signal_send) == -1)
-            return display_error("Unable to send the number case\n");
-        usleep(1000);
-    }
-    if (kill(player->enemy_pid, player->signal_stop) == -1)
-        return display_error("Unable to send the end turn\n");
+    if (send_letter(player, ping_letter) == FAILURE)
+        return FAILURE;
+    if (send_number(player, ping_number) == FAILURE)
+        return FAILURE;
     player->my_turn = FALSE;
     return SUCCESS;
 }
 
 int play_turn(player_t *player)
 {
-    char buff[3] = "zz";
+    char buff[3] = "";
 
     if (player == NULL)
         return FAILURE;
@@ -84,5 +105,8 @@ int play_turn(player_t *player)
         return display_error("Wrong attack entered\n");
     if (send_attack(player, buff[0], buff[1]) == FAILURE)
         return FAILURE;
+    my_putchar(buff[0]);
+    my_putchar(buff[1]);
+    my_putstr(": ");
     return get_hit_enemy(player, buff[0] - 'A', buff[1] - '1');
 }

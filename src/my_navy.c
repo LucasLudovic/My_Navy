@@ -49,6 +49,10 @@ void init_player(player_t *player, int argc, char **argv)
     player->enemy_map = NULL;
     map = retrieve_info_p1(player, argv);
     transform_map(map, player);
+    for (int i = 0; map[i] != NULL; i += 1)
+        if (map != NULL && map[i] != NULL)
+            free(map[i]);
+    free(map);
 }
 
 int my_navy(int argc, char **argv)

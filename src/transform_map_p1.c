@@ -63,12 +63,37 @@ link_numbers_horizontal(char *const *map, player_t *player, char nb, int i)
             player->map[map[i][2] - 'A'][j] = nb;
 }
 
+static int check_map(char **map)
+{
+    for (int i = 0; map[i] != NULL; i += 1) {
+        if (my_strlen(map[i]) != 7 && my_strlen(map[i]) != 0)
+            return FAILURE;
+        printf("map1 = %c\n", map[i][0]);
+        if (my_strlen(map[i]) == 0) {
+            map[i] = NULL;
+            free(map[i]);
+            continue;
+        }
+        if (map[i][1] != ':' || map[i][4] != ':' || map[i][7] != '\0')
+            return FAILURE;
+        if (map[i][0] < '0' || map[i][0] > '8' || map[i][3] < '0' ||
+            map[i][3] > '8' || map[i][6] < '0' || map[i][6] > '8')
+            return FAILURE;
+        if (map[i][2] < 'A' || map[i][2] > 'H' || map[i][5] < 'A' ||
+            map[i][5] > 'H')
+            return FAILURE;
+    }
+    return SUCCESS;
+}
+
 int transform_map(char **map, player_t *player)
 {
     char **info = NULL;
     char nb = 0;
 
     if (map == NULL)
+        return FAILURE;
+    if (check_map(map) == FAILURE)
         return FAILURE;
     create_map(player);
     for (int i = 0; map[i] != NULL; i += 1) {

@@ -42,12 +42,10 @@ void display_single_gameboard(char display, char **map)
 
 int display_user_gameboard(player_t *player)
 {
-    player->map = my_str_to_word_array("12345678 87654321 12345678 87654321");
-    player->enemy_map = my_str_to_word_array("........ ........ ........"
-        " ........ ........ ........"
-        " ........ ........");
     if (player == NULL || player->map == NULL || player->enemy_map == NULL)
         return FAILURE;
+    if ((PLAYER1 && !player->my_turn) || (PLAYER2 && player->my_turn))
+        return SUCCESS;
     display_single_gameboard(1, player->map);
     display_single_gameboard(2, player->enemy_map);
     return SUCCESS;

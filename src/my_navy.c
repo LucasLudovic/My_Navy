@@ -10,9 +10,9 @@
 #include <unistd.h>
 #include "my_macros.h"
 #include "connection.h"
+#include "my_navy.h"
 #include "gameboard.h"
 #include "gameloop.h"
-#include "my_navy.h"
 
 int destroy_end(player_t *player)
 {
@@ -39,33 +39,25 @@ void init_player(player_t *player, int argc)
     player->signal_send = SIGUSR1;
     player->signal_stop = SIGUSR2;
     player->enemy_pid = NO_PID;
-    if (PLAYER1) {
+    if (PLAYER1)
         player->my_turn = TRUE;
-    }
-
     if (PLAYER2)
         player->my_turn = FALSE;
     player->enemy_map = NULL;
     player->map = NULL;
 }
 
-static
-int **get_map(player_t *player, char **argv)
-{
-    char **map = retrieve_info_p1(player, argv);
-    transform_map(map, player);
-    return SUCCESS;
-}
-
 int my_navy(int argc, char **argv)
 {
     player_t *player = NULL;
+    char **map = NULL;
 
     player = malloc(sizeof(player_t));
     if (player == NULL)
         return destroy_end(player);
     init_player(player, argc);
-    get_map(player_t *player, argv);
+    map = retrieve_info_p1(player, argv);
+    transform_map(map, player);
     display_pid(player);
     if (connect_player(player, argc, argv) == FAILURE)
         return destroy_end(player);

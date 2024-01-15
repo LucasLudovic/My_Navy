@@ -7,7 +7,6 @@
 
 #include "my_macros.h"
 #include <stdio.h>
-#include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include "player.h"
@@ -37,7 +36,7 @@ static void close_file(FILE *file, char *buff)
         fclose(file);
 }
 
-static int assign_map(char const **av, char **map, player_t *player)
+static int assign_map(char const **argv, char **map, player_t *player)
 {
     FILE *file = NULL;
     char *buff = NULL;
@@ -46,9 +45,9 @@ static int assign_map(char const **av, char **map, player_t *player)
     int i = 0;
 
     if (PLAYER1)
-        file = fopen(av[1], "r");
+        file = fopen(argv[1], "r");
     if (PLAYER2)
-        file = fopen(av[2], "r");
+        file = fopen(argv[2], "r");
     while (end_file > 0) {
         end_file = getline(&buff, &len, file);
         map[i] = my_strdup(buff);
@@ -59,15 +58,15 @@ static int assign_map(char const **av, char **map, player_t *player)
     return SUCCESS;
 }
 
-static char **retrieve_map(const char **av, int count, char **map, player_t *player)
+static char **retrieve_map(const char **argv, int count, char **map, player_t *player)
 {
     map = malloc(sizeof(char *) * (count + 1));
-    assign_map(av, map, player);
+    assign_map(argv, map, player);
     delete_linebreak(map);
     return map;
 }
 
-char **retrieve_info_p1(player_t *player, char const **av)
+char **retrieve_info(player_t *player, char const **argv)
 {
     FILE *file = NULL;
     char *buff = NULL;
@@ -77,16 +76,16 @@ char **retrieve_info_p1(player_t *player, char const **av)
     char **map = NULL;
 
     if (PLAYER1)
-        file = fopen(av[1], "r");
+        file = fopen(argv[1], "r");
     if (PLAYER2)
-        file = fopen(av[2], "r");
+        file = fopen(argv[2], "r");
     if (file == NULL)
         return NULL;
     while (end_file > 0) {
         end_file = getline(&buff, &len, file);
         count += 1;
         }
-    map = retrieve_map(av, count, map, player);
+    map = retrieve_map(argv, count, map, player);
     close_file(file, buff);
     return map;
 }

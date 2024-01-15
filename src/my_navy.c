@@ -47,7 +47,7 @@ void init_player(player_t *player, int argc, char **argv)
     if (PLAYER2)
         player->my_turn = FALSE;
     player->enemy_map = NULL;
-    map = retrieve_info_p1(player, argv);
+    map = retrieve_info(player, argv);
     transform_map(map, player);
     for (int i = 0; map[i] != NULL; i += 1)
         if (map != NULL && map[i] != NULL)

@@ -9,7 +9,6 @@ SRC	=	src/main.c
 SRC +=	src/my_navy.c
 SRC	+=	src/connection.c
 SRC	+=	src/gameboard.c
-SRC	+=	src/retrieve_info_boat.c
 SRC	+=	src/retrieve_info.c
 SRC	+=	src/transform_map.c
 SRC	+=	src/gameloop.c

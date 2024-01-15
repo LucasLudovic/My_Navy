@@ -71,22 +71,36 @@ int send_attack(player_t *player, char case_letter, char case_number)
     return SUCCESS;
 }
 
+static
+void display_attack(char *buff)
+{
+    my_putchar(buff[0]);
+    my_putchar(buff[1]);
+    my_putstr(": ");
+}
+
 int play_turn(player_t *player)
 {
     char buff[3] = "zz";
 
     if (player == NULL)
         return FAILURE;
-    my_putstr("attack: ");
-    if (read(STDIN_FILENO, buff, 3) == -1)
-        return display_error("Unable to read the attack\n");
-    if (buff[2] != '\n')
-        return display_error("Wrong value entered\n");
-    buff[2] = '\0';
-    if ((buff[0] < 'A' || buff[0] > 'H') ||
-        (buff[1] < '1' || buff[1] > '8'))
-        return display_error("Wrong attack entered\n");
+    while (TRUE) {
+        my_putstr("attack: ");
+        if (read(STDIN_FILENO, buff, 3) == -1)
+            return display_error("Unable to read the attack\n");
+        if (buff[2] != '\n')
+            return display_error("Wrong value entered\n");
+        buff[2] = '\0';
+        if ((buff[0] < 'A' || buff[0] > 'H') ||
+            (buff[1] < '1' || buff[1] > '8')) {
+            my_putstr("Wrong attack entered\n");
+            continue;
+        }
+        break;
+    }
     if (send_attack(player, buff[0], buff[1]) == FAILURE)
         return FAILURE;
+    display_attack(buff);
     return get_hit_enemy(player, buff[0] - 'A', buff[1] - '1');
 }

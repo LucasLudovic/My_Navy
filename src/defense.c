@@ -44,7 +44,6 @@ int respond_to_attack(player_t *player, int received_number,
         return display_error("Unable to use player in response\n");
     if (received_number < 0 || received_letter < 0)
         return display_error("Wrong attack values\n");
-    printf("Test : %i-%i\n", received_number, received_letter);
     if (player->map[received_number][received_letter] != '.') {
         is_hit = TRUE;
     }

@@ -11,15 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static int count_boat(char **map)
-{
-    int i = 0;
-
-    while (map[i] != NULL)
-        i += 1;
-    return i;
-}
-
 static int create_map(player_t *player)
 {
     if (player == NULL)
@@ -87,7 +78,6 @@ static int check_map(char **map)
 
 int transform_map(char **map, player_t *player)
 {
-    char **info = NULL;
     char nb = 0;
 
     if (map == NULL)

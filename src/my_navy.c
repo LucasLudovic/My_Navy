@@ -63,6 +63,7 @@ void init_player(player_t *player, char **argv, int argc)
 int my_navy(int argc, char **argv)
 {
     player_t *player = NULL;
+    int return_value = FAILURE;
 
     if (argc < 2 || argv == NULL)
         return display_error("Wrong value of args\n");
@@ -73,8 +74,7 @@ int my_navy(int argc, char **argv)
     display_pid(player);
     if (connect_player(player, argc, argv) == FAILURE)
         return destroy_end(player);
-    if (loop(player) == FAILURE)
-        return destroy_end(player);
+    return_value = loop(player);
     destroy_end(player);
-    return SUCCESS;
+    return return_value;
 }

@@ -58,7 +58,8 @@ static int assign_map(char const **argv, char **map, player_t *player)
     return SUCCESS;
 }
 
-static char **retrieve_map(const char **argv, int count, char **map, player_t *player)
+static
+char **retrieve_map(const char **argv, int count, char **map, player_t *player)
 {
     map = malloc(sizeof(char *) * (count + 1));
     assign_map(argv, map, player);

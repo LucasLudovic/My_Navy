@@ -68,7 +68,6 @@ static int check_map(char **map)
     for (int i = 0; map[i] != NULL; i += 1) {
         if (my_strlen(map[i]) != 7 && my_strlen(map[i]) != 0)
             return FAILURE;
-        printf("map1 = %c\n", map[i][0]);
         if (my_strlen(map[i]) == 0) {
             map[i] = NULL;
             free(map[i]);
@@ -107,6 +106,5 @@ int transform_map(char **map, player_t *player)
             link_numbers_horizontal(map, player, nb, i);
         }
     }
-    my_show_word_array(player->map);
     return SUCCESS;
 }

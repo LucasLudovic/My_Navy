@@ -15,12 +15,18 @@
 #include "player.h"
 
 static
+void reset_value(void)
+{
+    retrieve_ping(RESET_PING);
+    retrieve_ping(RESET_STATE);
+}
+
+static
 int get_hit_enemy(player_t *player, int ping_letter, int ping_number)
 {
     struct sigaction sig_action;
 
-    retrieve_ping(RESET_PING);
-    retrieve_ping(RESET_STATE);
+    reset_value();
     if (init_sigaction(&sig_action, handle_signal) == FAILURE)
         return FAILURE;
     if (sigaction(SIGUSR1, &sig_action, NULL) == -1)
@@ -36,8 +42,7 @@ int get_hit_enemy(player_t *player, int ping_letter, int ping_number)
         my_putstr("hit\n");
         player->enemy_map[ping_number][ping_letter] = 'x';
     }
-    retrieve_ping(RESET_PING);
-    retrieve_ping(RESET_STATE);
+    reset_value();
     return SUCCESS;
 }
 
@@ -47,7 +52,6 @@ int send_attack(player_t *player, char case_letter, char case_number)
     int ping_letter = case_letter - 'A';
     int ping_number = case_number - '1';
 
-    usleep(1000);
     for (int i = 0; i < ping_letter; i += 1) {
         if (kill(player->enemy_pid, player->signal_send) == -1)
             return display_error("Unable to send the letter case\n");

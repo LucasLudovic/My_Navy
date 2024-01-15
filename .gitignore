@@ -8,3 +8,4 @@ coding-style-reports.log
 *.gcda
 vgcore*
 unit_tests
+bonus

@@ -83,4 +83,5 @@ int transform_map(char **map, player_t *player)
         }
     }
     my_show_word_array(player->map);
+    return SUCCESS;
 }

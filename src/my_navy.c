@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
+#include "my.h"
 #include "my_macros.h"
 #include "connection.h"
 #include "my_navy.h"
@@ -33,8 +34,10 @@ int destroy_end(player_t *player)
 }
 
 static
-void init_player(player_t *player, int argc)
+void init_player(player_t *player, int argc, char **argv)
 {
+    char **map = NULL;
+
     player->id = argc - 1;
     player->signal_send = SIGUSR1;
     player->signal_stop = SIGUSR2;
@@ -44,20 +47,18 @@ void init_player(player_t *player, int argc)
     if (PLAYER2)
         player->my_turn = FALSE;
     player->enemy_map = NULL;
-    player->map = NULL;
+    map = retrieve_info_p1(player, argv);
+    transform_map(map, player);
 }
 
 int my_navy(int argc, char **argv)
 {
     player_t *player = NULL;
-    char **map = NULL;
 
     player = malloc(sizeof(player_t));
     if (player == NULL)
         return destroy_end(player);
-    init_player(player, argc);
-    map = retrieve_info_p1(player, argv);
-    transform_map(map, player);
+    init_player(player, argc, argv);
     display_pid(player);
     if (connect_player(player, argc, argv) == FAILURE)
         return destroy_end(player);

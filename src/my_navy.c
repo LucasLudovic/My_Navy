@@ -39,24 +39,33 @@ void init_player(player_t *player, int argc)
     player->signal_send = SIGUSR1;
     player->signal_stop = SIGUSR2;
     player->enemy_pid = NO_PID;
-    if (PLAYER1)
+    if (PLAYER1) {
         player->my_turn = TRUE;
+    }
+
     if (PLAYER2)
         player->my_turn = FALSE;
     player->enemy_map = NULL;
     player->map = NULL;
 }
 
+static
+int **get_map(player_t *player, char **argv)
+{
+    char **map = retrieve_info_p1(player, argv);
+    transform_map(map, player);
+    return SUCCESS;
+}
+
 int my_navy(int argc, char **argv)
 {
     player_t *player = NULL;
-    char **map = retrieve_info_p1(argv);
 
     player = malloc(sizeof(player_t));
     if (player == NULL)
         return destroy_end(player);
-    transform_map(map, player);
     init_player(player, argc);
+    get_map(player_t *player, argv);
     display_pid(player);
     if (connect_player(player, argc, argv) == FAILURE)
         return destroy_end(player);

@@ -89,7 +89,6 @@ int play_turn(player_t *player)
         my_putstr("attack: ");
         if (read(STDIN_FILENO, buff, 3) == -1)
             return display_error("Unable to read the attack\n");
-        buff[2] = '\0';
         if ((buff[0] < 'A' || buff[0] > 'H') ||
             (buff[1] < '1' || buff[1] > '8') || buff[2] != '\n') {
             my_putstr("Wrong position\n");

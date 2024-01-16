@@ -51,7 +51,7 @@ int respond_to_attack(player_t *player, int received_number,
 }
 
 static
-void noname(player_t *player, int *changed_state, int *received_letter,
+void re_ping(player_t *player, int *changed_state, int *received_letter,
     int *received_number)
 {
     int received_value = 0;
@@ -91,7 +91,7 @@ int receive_attack(player_t *player)
         return display_error("Error setting SIGUSR2\n");
     while (changed_state < 2) {
         pause();
-        noname(player, &changed_state, &received_letter, &received_number);
+        re_ping(player, &changed_state, &received_letter, &received_number);
     }
     return respond_to_attack(player, received_number, received_letter);
 }

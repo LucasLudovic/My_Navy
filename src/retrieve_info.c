@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include "player.h"
 #include "my.h"
 
 static void check_linebreak(char **map, int y, int i)
@@ -27,48 +28,65 @@ static int delete_linebreak(char **map)
     return SUCCESS;
 }
 
-static int assign_map(char const **av, char **map)
+static void close_file(FILE *file, char *buff)
 {
-    FILE *file = fopen(av[2], "r");
+    if (buff != NULL)
+        free(buff);
+    if (file != NULL)
+        fclose(file);
+}
+
+static int assign_map(char const **argv, char **map, player_t *player)
+{
+    FILE *file = NULL;
     char *buff = NULL;
     size_t len = 0;
     ssize_t end_file = 1;
     int i = 0;
 
+    if (PLAYER1)
+        file = fopen(argv[1], "r");
+    if (PLAYER2)
+        file = fopen(argv[2], "r");
     while (end_file > 0) {
         end_file = getline(&buff, &len, file);
         map[i] = my_strdup(buff);
         i += 1;
     }
-    map[i - 1] = NULL;
-    if (buff != NULL)
-        free(buff);
-    if (file != NULL)
-        fclose(file);
+    map[i] = NULL;
+    close_file(file, buff);
     return SUCCESS;
 }
 
-char **retrieve_info_p2(char const **av)
+static
+char **retrieve_map(const char **argv, int count, char **map, player_t *player)
 {
-    FILE *file = fopen(av[2], "r");
+    map = malloc(sizeof(char *) * (count + 1));
+    assign_map(argv, map, player);
+    delete_linebreak(map);
+    return map;
+}
+
+char **retrieve_info(player_t *player, char const **argv)
+{
+    FILE *file = NULL;
     char *buff = NULL;
     size_t len = 0;
     ssize_t end_file = 1;
     int count = 0;
     char **map = NULL;
 
+    if (PLAYER1)
+        file = fopen(argv[1], "r");
+    if (PLAYER2)
+        file = fopen(argv[2], "r");
     if (file == NULL)
         return NULL;
     while (end_file > 0) {
         end_file = getline(&buff, &len, file);
         count += 1;
-        }
-    map = malloc(sizeof(char *) * count + 1);
-    assign_map(av, map);
-    delete_linebreak(map);
-    if (buff != NULL)
-        free(buff);
-    fclose(file);
-    printf("map = %s\n", map[0]);
-    return map; //penser à free la map
+    }
+    map = retrieve_map(argv, count, map, player);
+    close_file(file, buff);
+    return map;
 }

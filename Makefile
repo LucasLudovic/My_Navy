@@ -12,6 +12,8 @@ SRC	+=	src/gameboard.c
 SRC	+=	src/gameloop.c
 SRC	+=	src/attack.c
 SRC	+=	src/defense.c
+SRC	+=	src/retrieve_info.c
+SRC	+=	src/transform_map.c
 
 OBJ	=	$(SRC:.c=.o)
 

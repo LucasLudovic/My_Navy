@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2024
 ** navy
 ** File description:
-** transfor_map.c
+** transform_map.c
 */
 
 #include "my_macros.h"

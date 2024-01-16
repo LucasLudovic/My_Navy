@@ -36,7 +36,7 @@ static void close_file(FILE *file, char *buff)
         fclose(file);
 }
 
-static int assign_map(char const **argv, char **map, player_t *player)
+static int assign_map(char **argv, char **map, player_t *player)
 {
     FILE *file = NULL;
     char *buff = NULL;
@@ -59,7 +59,7 @@ static int assign_map(char const **argv, char **map, player_t *player)
 }
 
 static
-char **retrieve_map(const char **argv, int count, char **map, player_t *player)
+char **retrieve_map(char **argv, int count, char **map, player_t *player)
 {
     map = malloc(sizeof(char *) * (count + 1));
     assign_map(argv, map, player);
@@ -67,7 +67,7 @@ char **retrieve_map(const char **argv, int count, char **map, player_t *player)
     return map;
 }
 
-char **retrieve_info(player_t *player, char const **argv)
+char **retrieve_info(player_t *player, char **argv)
 {
     FILE *file = NULL;
     char *buff = NULL;

@@ -10,7 +10,8 @@
     #include "player.h"
 
 int my_navy(int argc, char **argv);
-char **retrieve_info_boat(char *info);
 int destroy_end(player_t *player);
+char **retrieve_info(player_t *player, char **argv);
+int transform_map(char **map, player_t *player);
 
 #endif

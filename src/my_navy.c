@@ -13,6 +13,7 @@
 #include "connection.h"
 #include "gameboard.h"
 #include "gameloop.h"
+#include "my_navy.h"
 
 int destroy_end(player_t *player)
 {
@@ -33,8 +34,10 @@ int destroy_end(player_t *player)
 }
 
 static
-void init_player(player_t *player, char **argv, int argc)
+int init_player(player_t *player, char **argv, int argc)
 {
+    char **map = NULL;
+
     player->id = argc - 1;
     player->signal_send = SIGUSR1;
     player->signal_stop = SIGUSR2;
@@ -48,16 +51,13 @@ void init_player(player_t *player, char **argv, int argc)
     }
     player->enemy_map = NULL;
     player->map = NULL;
-    // A supprimer
-    if (PLAYER2)
-        player->map = my_str_to_word_array(".55555.3 .......3 .......3"
-                                           " ..22.... ........ ....4444 ........ ........");
-    if (PLAYER1)
-        player->map = my_str_to_word_array("..2..... ..2..... ........ ...333.. .4......"
-                                           " .4...... .4.55555 .4......");
+    map = retrieve_info(player, argv);
+    if (transform_map(map, player) == FAILURE)
+        return FAILURE;
     player->enemy_map = my_str_to_word_array("........ ........ ........"
         " ........ ........ ........"
         " ........ ........");
+    return SUCCESS;
 }
 
 int my_navy(int argc, char **argv)
@@ -70,7 +70,8 @@ int my_navy(int argc, char **argv)
     player = malloc(sizeof(player_t));
     if (player == NULL)
         return destroy_end(player);
-    init_player(player, argv, argc);
+    if (init_player(player, argv, argc) == FAILURE)
+        return FAILURE;
     display_pid(player);
     if (connect_player(player, argc, argv) == FAILURE)
         return destroy_end(player);

@@ -49,8 +49,6 @@ int init_player(player_t *player, char **argv, int argc)
             player->enemy_pid = my_getnbr(argv[1]);
         player->my_turn = FALSE;
     }
-    player->enemy_map = NULL;
-    player->map = NULL;
     map = retrieve_info(player, argv);
     if (transform_map(map, player) == FAILURE)
         return FAILURE;

@@ -17,7 +17,7 @@ SRC	+=	src/transform_map.c
 
 OBJ	=	$(SRC:.c=.o)
 
-NAME	=	navy
+NAME	=	my_navy
 
 CC	=	gcc -g
 

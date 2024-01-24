@@ -5,6 +5,9 @@
 ** retrieve_info.c
 */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "my_macros.h"
 #include <stdio.h>
 #include <unistd.h>
@@ -12,13 +15,15 @@
 #include "player.h"
 #include "my.h"
 
-static void check_linebreak(char **map, int y, int i)
+static
+void check_linebreak(char **map, int y, int i)
 {
     if (map[y][i] == '\n')
         map[y][i] = '\0';
 }
 
-static int delete_linebreak(char **map)
+static
+int delete_linebreak(char **map)
 {
     if (map == NULL)
         return FAILURE;
@@ -28,7 +33,8 @@ static int delete_linebreak(char **map)
     return SUCCESS;
 }
 
-static void close_file(FILE *file, char *buff)
+static
+void close_file(FILE *file, char *buff)
 {
     if (buff != NULL)
         free(buff);
@@ -36,7 +42,8 @@ static void close_file(FILE *file, char *buff)
         fclose(file);
 }
 
-static int assign_map(char **argv, char **map, player_t *player)
+static
+int assign_map(char **argv, char **map, player_t *player)
 {
     FILE *file = NULL;
     char *buff = NULL;
@@ -67,6 +74,20 @@ char **retrieve_map(char **argv, int count, char **map, player_t *player)
     return map;
 }
 
+static
+int check_file(char **argv, player_t *player)
+{
+    int file = -1;
+
+    if (player == NULL || argv == NULL)
+        return FAILURE;
+    file = open(argv[player->id], O_RDONLY);
+    if (file == -1)
+        return FAILURE;
+    close(file);
+    return SUCCESS;
+}
+
 char **retrieve_info(player_t *player, char **argv)
 {
     FILE *file = NULL;
@@ -76,15 +97,18 @@ char **retrieve_info(player_t *player, char **argv)
     int count = 0;
     char **map = NULL;
 
-    if (PLAYER1)
-        file = fopen(argv[1], "r");
-    if (PLAYER2)
-        file = fopen(argv[2], "r");
+    if (check_file(argv, player) == FAILURE)
+        return NULL;
+    file = fopen(argv[player->id], "r");
     if (file == NULL)
         return NULL;
     while (end_file > 0) {
         end_file = getline(&buff, &len, file);
         count += 1;
+    }
+    if (count <= 1) {
+        fclose(file);
+        return NULL;
     }
     map = retrieve_map(argv, count, map, player);
     close_file(file, buff);

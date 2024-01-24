@@ -96,14 +96,14 @@ int request_connection(char const *pid_str)
         return FAILURE;
     if (sigaction(SIGUSR1, &sig_action, NULL) == -1)
         return display_error("Invalid use of sigaction\n");
+    usleep(1000);
     if (kill(pid_to_ping, SIGUSR1) == -1)
         return display_error("Wrong value of PID entered\n");
     while (received_signal != SIGUSR1) {
         pause();
         received_signal = get_info(GET_SIGNAL, NULL, NO_SIGNAL);
     }
-    my_putstr("successfully connected\n\n");
-    return SUCCESS;
+    return my_putstr("successfully connected\n\n");
 }
 
 int connect_player(player_t *player, int argc, char **argv)

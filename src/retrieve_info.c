@@ -60,7 +60,7 @@ int assign_map(char **argv, char **map, player_t *player)
         map[i] = my_strdup(buff);
         i += 1;
     }
-    map[i] = NULL;
+    map[i - 1] = NULL;
     close_file(file, buff);
     return SUCCESS;
 }

@@ -88,6 +88,17 @@ int check_file(char **argv, player_t *player)
     return SUCCESS;
 }
 
+static
+int check_error_file(player_t *player, char **argv, FILE **file)
+{
+    if (check_file(argv, player) == FAILURE)
+        return FAILURE;
+    *file = fopen(argv[player->id], "r");
+    if (*file == NULL)
+        return FAILURE;
+    return SUCCESS;
+}
+
 char **retrieve_info(player_t *player, char **argv)
 {
     FILE *file = NULL;
@@ -97,10 +108,7 @@ char **retrieve_info(player_t *player, char **argv)
     int count = 0;
     char **map = NULL;
 
-    if (check_file(argv, player) == FAILURE)
-        return NULL;
-    file = fopen(argv[player->id], "r");
-    if (file == NULL)
+    if (check_error_file(player, argv, &file) == FAILURE)
         return NULL;
     while (end_file > 0) {
         end_file = getline(&buff, &len, file);

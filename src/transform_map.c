@@ -34,42 +34,84 @@ int create_map(player_t *player)
 }
 
 static
-int link_numbers_vertical(char *const *map, player_t *player, char nb, int i)
+int add_boat_vertical_inferior(player_t *player, char *const *map, char nb,
+    int i)
 {
-    if (map[i][2] <= map[i][5])
-        for (int j = (map[i][2] - 'A'); j != (map[i][5] - 'A'); j += 1) {
-            if (player->map[j][map[i][3] - '1'] != '.' && player->map[j][map[i][3] - '1'] != nb) {
-                return display_error("Boat supperpose\n");
-            }
-            player->map[j][map[i][3] - '1'] = nb;
+    for (int j = (map[i][2] - 'A'); j != (map[i][5] - 'A'); j += 1) {
+        if (player->map[j][map[i][3] - '1'] != '.' &&
+            player->map[j][map[i][3] - '1'] != nb) {
+            return display_error("Boat supperpose\n");
         }
-    if (map[i][2] >= map[i][5])
-        for (int j = (map[i][5] - 'A'); j != (map[i][2] - 'A'); j -= 1) {
-            if (player->map[j][map[i][3] - '1'] != '.' && player->map[j][map[i][3] - '1'] != nb) {
-                return display_error("Boat supperpose\n");
-            }
-            player->map[j][map[i][3] - '1'] = nb;
-        }
+        player->map[j][map[i][3] - '1'] = nb;
+    }
     return SUCCESS;
 }
 
 static
-int link_numbers_horizontal(char *const *map, player_t *player, char nb, int i)
+int add_boat_vertical_superior(player_t *player, char *const *map, char nb,
+    int i)
+{
+    for (int j = (map[i][5] - 'A'); j != (map[i][2] - 'A'); j -= 1) {
+        if (player->map[j][map[i][3] - '1'] != '.' &&
+            player->map[j][map[i][3] - '1'] != nb) {
+            return display_error("Boat supperpose\n");
+        }
+        player->map[j][map[i][3] - '1'] = nb;
+    }
+    return SUCCESS;
+}
+
+static
+int link_numbers_vertical(char *const *map, player_t *player, char nb,
+    int i)
+{
+    if (map[i][2] <= map[i][5])
+        if (add_boat_vertical_inferior(player, map, nb, i) == FAILURE)
+            return FAILURE;
+    if (map[i][2] >= map[i][5])
+        if (add_boat_vertical_superior(player, map, nb, i) == FAILURE)
+            return FAILURE;
+    return SUCCESS;
+}
+
+static
+int add_boat_horizontal_inferior(player_t *player, char *const *map, char nb,
+    int i)
+{
+    for (int j = (map[i][3] - '1'); j != (map[i][6] - '1'); j += 1) {
+        if (player->map[map[i][2] - 'A'][j] != '.' &&
+            player->map[map[i][2] - 'A'][j] != nb) {
+            return display_error("Boat supperpose\n");
+        }
+        player->map[map[i][2] - 'A'][j] = nb;
+    }
+    return SUCCESS;
+}
+
+static
+int add_boat_horizontal_superior(player_t *player, char *const *map, char nb,
+    int i)
+{
+    for (int j = (map[i][6] - '1'); j != (map[i][3] - '1'); j += 1) {
+        if (player->map[map[i][2] - 'A'][j] != '.' &&
+            player->map[map[i][2] - 'A'][j] != nb) {
+            return display_error("Boat supperpose\n");
+        }
+        player->map[map[i][2] - 'A'][j] = nb;
+    }
+    return SUCCESS;
+}
+
+static
+int link_numbers_horizontal(char *const *map, player_t *player, char nb,
+    int i)
 {
     if (map[i][3] <= map[i][6])
-        for (int j = (map[i][3] - '1'); j != (map[i][6] - '1'); j += 1) {
-            if (player->map[map[i][2] - 'A'][j] != '.' && player->map[map[i][2] - 'A'][j] != nb) {
-                return display_error("Boat supperpose\n");
-            }
-            player->map[map[i][2] - 'A'][j] = nb;
-        }
+        if (add_boat_horizontal_inferior(player, map, nb, i) == FAILURE)
+            return FAILURE;
     if (map[i][3] >= map[i][6])
-        for (int j = (map[i][6] - '1'); j != (map[i][3] - '1'); j += 1) {
-            if (player->map[map[i][2] - 'A'][j] != '.' && player->map[map[i][2] - 'A'][j] != nb) {
-                return display_error("Boat supperpose\n");
-            }
-            player->map[map[i][2] - 'A'][j] = nb;
-        }
+        if (add_boat_horizontal_superior(player, map, nb, i) == FAILURE)
+            return FAILURE;
     return SUCCESS;
 }
 
@@ -102,6 +144,20 @@ int check_map(char **map)
     return SUCCESS;
 }
 
+static
+int link_map(player_t *player, char **map, char nb, int i)
+{
+    if (map[i][2] != map[i][5]) {
+        if (link_numbers_vertical(map, player, nb, i) == FAILURE)
+            return FAILURE;
+    }
+    if (map[i][3] != map[i][6]) {
+        if (link_numbers_horizontal(map, player, nb, i) == FAILURE)
+            return FAILURE;
+    }
+    return SUCCESS;
+}
+
 int transform_map(char **map, player_t *player)
 {
     char nb = 0;
@@ -115,14 +171,8 @@ int transform_map(char **map, player_t *player)
         nb = map[i][0];
         player->map[map[i][2] - 'A'][map[i][3] - '1'] = nb;
         player->map[map[i][5] - 'A'][map[i][6] - '1'] = nb;
-        if (map[i][2] != map[i][5]) {
-            if (link_numbers_vertical(map, player, nb, i) == FAILURE)
-                return FAILURE;
-        }
-        if (map[i][3] != map[i][6]) {
-            if (link_numbers_horizontal(map, player, nb, i) == FAILURE)
-                return FAILURE;
-        }
+        if (link_map(player, map, nb, i) == FAILURE)
+            return FAILURE;
     }
     return SUCCESS;
 }

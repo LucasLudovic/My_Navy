@@ -7,6 +7,7 @@
 
 #include <signal.h>
 #include <unistd.h>
+#include <ucontext.h>
 #include "player.h"
 #include "my.h"
 #include "my_macros.h"

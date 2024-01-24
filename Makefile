@@ -14,6 +14,7 @@ SRC	+=	src/attack.c
 SRC	+=	src/defense.c
 SRC	+=	src/retrieve_info.c
 SRC	+=	src/transform_map.c
+SRC	+=	src/check_win_loose.c
 
 OBJ	=	$(SRC:.c=.o)
 

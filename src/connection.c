@@ -22,7 +22,6 @@ void display_pid(player_t *player)
         my_putstr("waiting for enemy connection...\n");
 }
 
-static
 int get_info(int increment, siginfo_t *info, int signal)
 {
     static int last_signal = NO_SIGNAL;

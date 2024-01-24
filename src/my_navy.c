@@ -39,6 +39,7 @@ int init_player(player_t *player, char **argv, int argc)
     char **map = NULL;
 
     player->id = argc - 1;
+    player->win_loose = 0;
     player->signal_send = SIGUSR1;
     player->signal_stop = SIGUSR2;
     player->enemy_pid = NO_PID;

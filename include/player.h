@@ -14,6 +14,7 @@ typedef struct player_s {
     int enemy_pid;
     int signal_send;
     int signal_stop;
+    int win_loose;
     char **map;
     char **enemy_map;
 } player_t;

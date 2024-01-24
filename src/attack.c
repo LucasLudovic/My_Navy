@@ -51,8 +51,10 @@ int send_attack(player_t *player, char case_letter, char case_number)
 {
     int ping_letter = case_letter - 'A';
     int ping_number = case_number - '1';
+    int count = 0;
 
     for (int i = 0; i < ping_letter; i += 1) {
+        usleep(1000);
         if (kill(player->enemy_pid, player->signal_send) == -1)
             return display_error("Unable to send the letter case\n");
         usleep(1000);
@@ -67,6 +69,14 @@ int send_attack(player_t *player, char case_letter, char case_number)
     }
     if (kill(player->enemy_pid, player->signal_stop) == -1)
         return display_error("Unable to send the end turn\n");
+    for (int i = 0; i != Y_CASE; i += 1)
+        for (int j = 0; j != X_CASE; j += 1)
+            if (player->map[i][j] != '.' && player->map[i][j] != 'o' && player->map[i][j] == 'x')
+                count = 1;
+    if (count == 0)
+        if (kill(player->enemy_pid, player->signal_stop) == -1) {
+            return display_error("Unable to send win");
+        }
     player->my_turn = FALSE;
     return SUCCESS;
 }

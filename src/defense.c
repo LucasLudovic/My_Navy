@@ -13,6 +13,7 @@
 #include "my_macros.h"
 #include "player.h"
 #include "connection.h"
+#include "check_win_loose.h"
 
 static
 int respond_hit(player_t *player, int is_hit, int received_number,
@@ -93,5 +94,6 @@ int receive_attack(player_t *player)
         pause();
         re_ping(player, &changed_state, &received_letter, &received_number);
     }
+    check_win_loose(player);
     return respond_to_attack(player, received_number, received_letter);
 }

@@ -71,6 +71,8 @@ int my_navy(int argc, char **argv)
     if (init_player(player, argv, argc) == FAILURE)
         return FAILURE;
     display_pid(player);
+    if (PLAYER2 && my_getnbr(argv[1]) < 1000)
+        return display_error("You're not authorized to use this pid\n");
     if (connect_player(player, argc, argv) == FAILURE)
         return destroy_end(player);
     return_value = loop(player);

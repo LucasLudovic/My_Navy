@@ -34,11 +34,34 @@ int create_map(player_t *player)
     return SUCCESS;
 }
 
+static
+int check_single_case(const player_t *player, const int i, const int j)
+{
+    for (int k = 0; k < X_CASE; k += 1) {
+        if ((player->map[j][k] < '2' || player->map[j][k] > '5') &&
+            player->map[j][k] != '.')
+            return FAILURE;
+        if (player->map[j][k] == i + '0')
+            return SUCCESS;
+    }
+    return FAILURE;
+}
+
+static
+int check_number_boat(const player_t *player, const int i)
+{
+    for (int j = 0; j < Y_CASE; j += 1) {
+        if (check_single_case(player, i, j) == SUCCESS)
+            return SUCCESS;
+    }
+    return display_error("Wrong size for the boat\n");
+}
+
 int transform_map(char **map, player_t *player)
 {
     char nb = 0;
 
-    if (map == NULL)
+    if (map == NULL || player == NULL)
         return FAILURE;
     if (check_map(map) == FAILURE)
         return FAILURE;
@@ -48,6 +71,10 @@ int transform_map(char **map, player_t *player)
         player->map[map[i][2] - 'A'][map[i][3] - '1'] = nb;
         player->map[map[i][5] - 'A'][map[i][6] - '1'] = nb;
         if (link_map(player, map, nb, i) == FAILURE)
+            return FAILURE;
+    }
+    for (int i = 2; i <= 5; i += 1) {
+        if (check_number_boat(player, i) == FAILURE)
             return FAILURE;
     }
     return SUCCESS;

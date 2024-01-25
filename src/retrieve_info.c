@@ -114,7 +114,7 @@ char **retrieve_info(player_t *player, char **argv)
         end_file = getline(&buff, &len, file);
         count += 1;
     }
-    if (count <= 1) {
+    if (count != 5) {
         fclose(file);
         return NULL;
     }
